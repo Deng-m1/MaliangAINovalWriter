@@ -207,10 +207,19 @@ class _NovelSettingSidebarState extends State<NovelSettingSidebar>
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
-              context.read<SettingBloc>().add(DeleteSettingGroup(
+              final settingBloc = context.read<SettingBloc>();
+              settingBloc.add(DeleteSettingGroup(
                 novelId: widget.novelId,
                 groupId: groupId,
               ));
+              
+              // 修复：删除后延迟刷新列表，确保 UI 更新
+              Future.delayed(const Duration(milliseconds: 500), () {
+                if (mounted) {
+                  AppLogger.i('NovelSettingSidebar', '删除设定组后刷新列表');
+                  settingBloc.add(LoadSettingGroups(widget.novelId));
+                }
+              });
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: WebTheme.error,
