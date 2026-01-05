@@ -630,7 +630,14 @@ class AiConfigBloc extends Bloc<AiConfigEvent, AiConfigState> {
 
       // 统一使用LoadModelsForProvider加载模型列表，不自动验证API Key
       AppLogger.i('AiConfigBloc', '触发加载 ${event.providerName} 的默认模型列表 (LoadModelsForProvider)');
-      add(LoadModelsForProvider(provider: event.providerName));
+      
+      // 添加事件去重或状态检查，避免无限循环
+      // 例如：检查是否已经在加载该提供商的模型
+      if (state.selectedProviderForModels != event.providerName || state.modelsForProviderInfo.isEmpty) {
+         add(LoadModelsForProvider(provider: event.providerName));
+      } else {
+         AppLogger.i('AiConfigBloc', '该提供商模型已加载，跳过重复请求');
+      }
       // --- 修改结束 ---
 
     } catch (e, stackTrace) {
