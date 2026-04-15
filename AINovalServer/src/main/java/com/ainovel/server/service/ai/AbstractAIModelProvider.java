@@ -34,6 +34,9 @@ public abstract class AbstractAIModelProvider implements AIModelProvider {
     
     protected boolean proxyEnabled;
     
+    // Whether to skip TLS certificate verification (only for debugging proxies)
+    protected boolean trustAllCerts;
+    
     /**
      * 构造函数
      * @param providerName 提供商名称

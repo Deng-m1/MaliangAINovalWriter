@@ -57,7 +57,8 @@ public class SecurityConfig {
                     "/api/v1/admin/**","/api/v1/public-models/**","/api/v1/credits/**","/api/v1/preset-aggregation/**", "/api/v1/presets/**",
                     "/api/v1/setting-histories/**","/api/v1/setting-generation/**","/api/v1/test/setting-generation/**","/api/v1/compose/**","/api/v1/tool-orchestration/**",
                     "/api/v1/analytics/**", "/api/v1/payments/**", "/api/v1/pricing/**",
-                    "/api/v1/knowledge-bases/**", "/api/v1/knowledge-extraction-tasks/**", "/api/v1/prompt-market/**")
+                    "/api/v1/knowledge-bases/**", "/api/v1/knowledge-extraction-tasks/**", "/api/v1/prompt-market/**",
+                    "/api/v1/test/**", "/api/test/**")
         );
         
         // 添加认证失败处理器
@@ -80,9 +81,12 @@ public class SecurityConfig {
                 // 管理员面板静态资源
                 .pathMatchers("/admin", "/admin/", "/admin/index.html", "/admin/favicon.ico", "/admin/manifest.json").permitAll()
                 .pathMatchers("/admin/assets/**", "/admin/icons/**", "/admin/canvaskit/**", "/admin/*.js", "/admin/*.css", "/admin/fonts/**").permitAll()
-                // 放开 Actuator 指标端点给 Prometheus 抓取
+                // 放开 Actuator health/prometheus 端点给 Prometheus 抓取; block all other actuator endpoints
                 .pathMatchers(HttpMethod.GET, "/actuator/prometheus").permitAll()
                 .pathMatchers(HttpMethod.GET, "/actuator/health").permitAll()
+                .pathMatchers("/actuator/**").authenticated()
+                // Swagger/OpenAPI: require authentication in non-dev profiles
+                .pathMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/webjars/**").authenticated()
                 .pathMatchers("/api/v1/auth/**").permitAll()
                 .pathMatchers("/api/v1/auth/login").permitAll()
                 .pathMatchers("/api/v1/auth/login/phone").permitAll()
@@ -156,6 +160,9 @@ public class SecurityConfig {
                 .pathMatchers("/api/v1/knowledge-extraction-tasks/**").authenticated()
                 // 提示词市场
                 .pathMatchers("/api/v1/prompt-market/**").authenticated()
+                // Test endpoints: require authentication (also profile-restricted)
+                .pathMatchers("/api/v1/test/**").authenticated()
+                .pathMatchers("/api/test/**").authenticated()
                 // 其他所有请求需要认证
                 .anyExchange().authenticated()
                 )
@@ -178,10 +185,21 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+        // Use allowedOriginPatterns instead of wildcard "*" to support credentials.
+        // In production, restrict this to your actual frontend domain(s) via
+        // the CORS_ALLOWED_ORIGINS environment variable (comma-separated).
+        String allowedOrigins = System.getenv("CORS_ALLOWED_ORIGINS");
+        if (allowedOrigins != null && !allowedOrigins.isBlank()) {
+            configuration.setAllowedOriginPatterns(Arrays.asList(allowedOrigins.split(",")));
+        } else {
+            // Default: allow all origin patterns (development convenience).
+            // For production, always set CORS_ALLOWED_ORIGINS.
+            configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        }
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

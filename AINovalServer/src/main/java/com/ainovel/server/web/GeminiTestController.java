@@ -21,10 +21,12 @@ import reactor.core.publisher.Mono;
 
 /**
  * Gemini API测试控制器
+ * Restricted to dev and test profiles only.
  */
 @RestController
 @RequestMapping("/api/test/gemini")
 @Slf4j
+@org.springframework.context.annotation.Profile({"dev", "test", "open-dev"})
 public class GeminiTestController {
     
     /**

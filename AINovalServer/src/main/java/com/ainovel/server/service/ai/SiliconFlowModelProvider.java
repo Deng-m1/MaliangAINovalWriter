@@ -61,19 +61,20 @@ public class SiliconFlowModelProvider extends AbstractAIModelProvider {
         
         if (proxyEnabled) {
             try {
-                // 配置SSL上下文
-                SslContext sslContext = SslContextBuilder
-                        .forClient()
-                        .trustManager(InsecureTrustManagerFactory.INSTANCE)
-                        .build();
-                
-                // 配置HTTP客户端
                 httpClient = httpClient
-                        .secure(t -> t.sslContext(sslContext))
                         .proxy(spec -> spec
                                 .type(ProxyProvider.Proxy.HTTP)
                                 .host(proxyHost)
                                 .port(proxyPort));
+                
+                if (trustAllCerts) {
+                    SslContext sslContext = SslContextBuilder
+                            .forClient()
+                            .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                            .build();
+                    httpClient = httpClient.secure(t -> t.sslContext(sslContext));
+                    log.warn("已启用 trustAllCerts（仅建议用于排障），生产请关闭！");
+                }
                 
                 log.info("已启用代理: {}:{}", proxyHost, proxyPort);
             } catch (Exception e) {
