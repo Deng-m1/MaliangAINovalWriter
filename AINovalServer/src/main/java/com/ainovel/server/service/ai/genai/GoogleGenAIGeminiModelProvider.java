@@ -75,17 +75,20 @@ public class GoogleGenAIGeminiModelProvider extends AbstractAIModelProvider {
 
         if (proxyEnabled && proxyHost != null && proxyPort > 0) {
             try {
-                SslContext sslContext = SslContextBuilder
-                        .forClient()
-                        .trustManager(InsecureTrustManagerFactory.INSTANCE)
-                        .build();
-
                 httpClient = httpClient
-                        .secure(t -> t.sslContext(sslContext))
                         .proxy(spec -> spec
                                 .type(ProxyProvider.Proxy.HTTP)
                                 .host(proxyHost)
                                 .port(proxyPort));
+
+                if (trustAllCerts) {
+                    SslContext sslContext = SslContextBuilder
+                            .forClient()
+                            .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                            .build();
+                    httpClient = httpClient.secure(t -> t.sslContext(sslContext));
+                    log.warn("GoogleGenAIGemini: 已启用 trustAllCerts（仅建议用于排障），生产请关闭！");
+                }
 
                 log.info("GoogleGenAIGemini: 已启用代理: {}:{}", proxyHost, proxyPort);
             } catch (Exception e) {

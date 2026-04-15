@@ -97,6 +97,7 @@ public class GrokModelProvider extends AbstractAIModelProvider {
         if (proxyEnabled) {
             this.proxyHost = proxyConfig.getHost();
             this.proxyPort = proxyConfig.getPort();
+            this.trustAllCerts = proxyConfig.isTrustAllCerts();
         }
         initWebClient();
     }
@@ -119,19 +120,21 @@ public class GrokModelProvider extends AbstractAIModelProvider {
                             this.proxyHost, this.proxyPort);
                 }
                 
-                // 配置SSL上下文
-                SslContext sslContext = SslContextBuilder
-                        .forClient()
-                        .trustManager(InsecureTrustManagerFactory.INSTANCE)
-                        .build();
-                
                 // 配置HTTP客户端
                 httpClient = httpClient
-                        .secure(t -> t.sslContext(sslContext))
                         .proxy(spec -> spec
                                 .type(ProxyProvider.Proxy.HTTP)
                                 .host(proxyHost)
                                 .port(proxyPort));
+                
+                if (trustAllCerts) {
+                    SslContext sslContext = SslContextBuilder
+                            .forClient()
+                            .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                            .build();
+                    httpClient = httpClient.secure(t -> t.sslContext(sslContext));
+                    log.warn("已启用 trustAllCerts（仅建议用于排障），生产请关闭！");
+                }
                 
                 log.info("Grok Provider: 已启用代理: {}:{}", proxyHost, proxyPort);
             } catch (Exception e) {

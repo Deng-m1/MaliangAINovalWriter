@@ -34,6 +34,9 @@ public abstract class AbstractAIModelProvider implements AIModelProvider {
     
     protected boolean proxyEnabled;
     
+    // Whether to skip TLS certificate verification (only for debugging proxies)
+    protected boolean trustAllCerts;
+    
     /**
      * 构造函数
      * @param providerName 提供商名称
@@ -58,6 +61,14 @@ public abstract class AbstractAIModelProvider implements AIModelProvider {
         this.proxyHost = host;
         this.proxyPort = port;
         this.proxyEnabled = true;
+    }
+    
+    /**
+     * 设置是否信任所有证书（仅限排障时临时开启）
+     * @param trustAllCerts 是否信任所有证书
+     */
+    public void setTrustAllCerts(boolean trustAllCerts) {
+        this.trustAllCerts = trustAllCerts;
     }
     
     /**

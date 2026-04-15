@@ -15,12 +15,14 @@ import java.util.Map;
 
 /**
  * 邮件测试控制器
+ * Restricted to dev and test profiles only to prevent abuse in production.
  */
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/test")
 @RequiredArgsConstructor
 @Tag(name = "邮件测试", description = "邮件功能测试相关接口")
+@org.springframework.context.annotation.Profile({"dev", "test", "open-dev"})
 public class MailTestController {
     
     private final MailTestService mailTestService;

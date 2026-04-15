@@ -12,10 +12,10 @@ spring:
     name: ai-novel-server
   data:
     mongodb:
-      uri: mongodb://mongo:123456@localhost:27017/ainoval?authSource=admin&authMechanism=SCRAM-SHA-1
+      uri: mongodb://${MONGO_USERNAME:mongo}:${MONGO_PASSWORD:}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/ainoval?authSource=admin&authMechanism=SCRAM-SHA-1
       auto-index-creation: true
-      password: 123456
-      username: mongo
+      password: ${MONGO_PASSWORD:}
+      username: ${MONGO_USERNAME:mongo}
       database: ainovel
       authentication-database: admin
       map-key-dot-replacement: "#DOT#"
@@ -147,8 +147,9 @@ management:
 ainovel:
   security:
     jwt:
-      # 统一引用 JWT_SECRET 环境变量，保持与 dev/prod 一致
-      secret-key: ${JWT_SECRET:changeme_in_production_environment}
+      # JWT secret MUST be provided via JWT_SECRET environment variable.
+      # Do NOT use a hardcoded default in production.
+      secret-key: ${JWT_SECRET:}
       expiration-time: 600000  # 10分钟，单位毫秒
       refresh-token-expiration: 604800000  # 7天，单位毫秒
   performance:
