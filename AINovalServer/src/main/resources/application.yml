@@ -12,9 +12,9 @@ spring:
     name: ai-novel-server
   data:
     mongodb:
-      uri: mongodb://${MONGO_USERNAME:mongo}:${MONGO_PASSWORD}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/ainoval?authSource=admin&authMechanism=SCRAM-SHA-1
+      uri: mongodb://${MONGO_USERNAME:mongo}:${MONGO_PASSWORD:}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/ainoval?authSource=admin&authMechanism=SCRAM-SHA-1
       auto-index-creation: true
-      password: ${MONGO_PASSWORD}
+      password: ${MONGO_PASSWORD:}
       username: ${MONGO_USERNAME:mongo}
       database: ainovel
       authentication-database: admin

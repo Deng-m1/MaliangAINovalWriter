@@ -64,6 +64,14 @@ public abstract class AbstractAIModelProvider implements AIModelProvider {
     }
     
     /**
+     * 设置是否信任所有证书（仅限排障时临时开启）
+     * @param trustAllCerts 是否信任所有证书
+     */
+    public void setTrustAllCerts(boolean trustAllCerts) {
+        this.trustAllCerts = trustAllCerts;
+    }
+    
+    /**
      * 禁用HTTP代理
      */
     public void disableProxy() {

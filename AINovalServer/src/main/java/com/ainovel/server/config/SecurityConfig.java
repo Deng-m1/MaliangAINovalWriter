@@ -190,7 +190,7 @@ public class SecurityConfig {
         // the CORS_ALLOWED_ORIGINS environment variable (comma-separated).
         String allowedOrigins = System.getenv("CORS_ALLOWED_ORIGINS");
         if (allowedOrigins != null && !allowedOrigins.isBlank()) {
-            configuration.setAllowedOriginPatterns(Arrays.asList(allowedOrigins.split(",")));
+            configuration.setAllowedOriginPatterns(Arrays.stream(allowedOrigins.split(",")).map(String::trim).filter(s -> !s.isEmpty()).toList());
         } else {
             // Default: allow all origin patterns (development convenience).
             // For production, always set CORS_ALLOWED_ORIGINS.

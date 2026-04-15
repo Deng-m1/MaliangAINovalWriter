@@ -372,6 +372,11 @@ public class TracingAIModelProviderDecorator implements AIModelProvider, ToolCal
     }
 
     @Override
+    public void setTrustAllCerts(boolean trustAllCerts) {
+        decoratedProvider.setTrustAllCerts(trustAllCerts);
+    }
+
+    @Override
     public void disableProxy() {
         decoratedProvider.disableProxy();
     }

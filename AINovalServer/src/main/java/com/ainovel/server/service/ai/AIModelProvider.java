@@ -59,6 +59,12 @@ public interface AIModelProvider {
     void setProxy(String host, int port);
 
     /**
+     * 设置是否信任所有证书（仅限排障时临时开启）
+     * @param trustAllCerts 是否信任所有证书
+     */
+    void setTrustAllCerts(boolean trustAllCerts);
+
+    /**
      * 禁用HTTP代理
      */
     void disableProxy();

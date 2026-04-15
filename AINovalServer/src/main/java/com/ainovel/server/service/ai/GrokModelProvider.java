@@ -97,6 +97,7 @@ public class GrokModelProvider extends AbstractAIModelProvider {
         if (proxyEnabled) {
             this.proxyHost = proxyConfig.getHost();
             this.proxyPort = proxyConfig.getPort();
+            this.trustAllCerts = proxyConfig.isTrustAllCerts();
         }
         initWebClient();
     }

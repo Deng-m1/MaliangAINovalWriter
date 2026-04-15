@@ -106,6 +106,7 @@ public class ProxyConfig {
             for (AIModelProvider provider : providers) {
                 try {
                     provider.setProxy(host, port);
+                    provider.setTrustAllCerts(trustAllCerts);
                     log.info("已为 {} 模型提供商配置代理", provider.getProviderName());
                 } catch (Exception e) {
                     log.error("为 {} 模型提供商配置代理时出错: {}", 
