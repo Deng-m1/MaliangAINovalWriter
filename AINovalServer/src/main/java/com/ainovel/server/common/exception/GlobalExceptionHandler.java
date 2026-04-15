@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 import org.springframework.security.authentication.BadCredentialsException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -226,6 +227,36 @@ public class GlobalExceptionHandler {
         
         return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error("数据映射错误，请稍后重试", "MAPPING_ERROR")));
+    }
+    
+    /**
+     * 处理资源未找到异常
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public Mono<ResponseEntity<ApiResponse<?>>> handleResourceNotFoundException(ResourceNotFoundException e) {
+        log.warn("资源未找到: {}", e.getMessage());
+        return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(e.getMessage(), "RESOURCE_NOT_FOUND")));
+    }
+    
+    /**
+     * 处理权限不足异常
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public Mono<ResponseEntity<ApiResponse<?>>> handleAccessDeniedException(AccessDeniedException e) {
+        log.warn("权限不足: {}", e.getMessage());
+        return Mono.just(ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error("权限不足，无法执行此操作", "ACCESS_DENIED")));
+    }
+    
+    /**
+     * 处理非法参数异常
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public Mono<ResponseEntity<ApiResponse<?>>> handleIllegalArgumentException(IllegalArgumentException e) {
+        log.warn("非法参数: {}", e.getMessage());
+        return Mono.just(ResponseEntity.badRequest()
+                .body(ApiResponse.error(e.getMessage(), "ILLEGAL_ARGUMENT")));
     }
     
     /**

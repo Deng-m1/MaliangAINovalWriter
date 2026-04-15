@@ -11,6 +11,7 @@ import com.ainovel.server.common.response.ApiResponse;
 import com.ainovel.server.domain.model.Role;
 import com.ainovel.server.service.RoleService;
 
+import jakarta.validation.Valid;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -56,7 +57,10 @@ public class AdminRoleController {
      * 创建新角色
      */
     @PostMapping
-    public Mono<ResponseEntity<ApiResponse<Role>>> createRole(@RequestBody Role role) {
+    public Mono<ResponseEntity<ApiResponse<Role>>> createRole(@Valid @RequestBody Role role) {
+        if (role.getRoleName() == null || role.getRoleName().isBlank()) {
+            return Mono.just(ResponseEntity.badRequest().body(ApiResponse.error("角色名称不能为空")));
+        }
         return roleService.createRole(role)
                 .map(savedRole -> ResponseEntity.ok(ApiResponse.success(savedRole)))
                 .onErrorResume(e -> Mono.just(
@@ -68,7 +72,7 @@ public class AdminRoleController {
      * 更新角色
      */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<ApiResponse<Role>>> updateRole(@PathVariable String id, @RequestBody Role role) {
+    public Mono<ResponseEntity<ApiResponse<Role>>> updateRole(@PathVariable String id, @Valid @RequestBody Role role) {
         return roleService.updateRole(id, role)
                 .map(updatedRole -> ResponseEntity.ok(ApiResponse.success(updatedRole)))
                 .onErrorResume(e -> Mono.just(
@@ -94,7 +98,10 @@ public class AdminRoleController {
     @PostMapping("/{id}/permissions")
     public Mono<ResponseEntity<ApiResponse<Role>>> addPermissionToRole(
             @PathVariable String id, 
-            @RequestBody PermissionRequest request) {
+            @Valid @RequestBody PermissionRequest request) {
+        if (request.getPermission() == null || request.getPermission().isBlank()) {
+            return Mono.just(ResponseEntity.badRequest().body(ApiResponse.error("权限名称不能为空")));
+        }
         return roleService.addPermissionToRole(id, request.getPermission())
                 .map(updatedRole -> ResponseEntity.ok(ApiResponse.success(updatedRole)))
                 .onErrorResume(e -> Mono.just(
