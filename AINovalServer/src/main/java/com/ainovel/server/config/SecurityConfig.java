@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -28,6 +29,7 @@ import com.ainovel.server.security.JwtServerAuthenticationConverter;
  */
 @Configuration
 @EnableWebFluxSecurity
+@EnableReactiveMethodSecurity
 @Profile("!test")
 public class SecurityConfig {
 
