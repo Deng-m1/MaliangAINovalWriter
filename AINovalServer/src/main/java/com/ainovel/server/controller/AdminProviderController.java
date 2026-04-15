@@ -69,6 +69,9 @@ public class AdminProviderController {
     public Mono<ResponseEntity<ApiResponse<List<ModelInfo>>>> getModelsWithApiKey(
             @PathVariable String provider,
             @RequestBody ApiKeyRequest request) {
+        if (request.getApiKey() == null || request.getApiKey().isBlank()) {
+            return Mono.just(ResponseEntity.badRequest().body(ApiResponse.error("API Key不能为空")));
+        }
         return aiService.getModelInfosForProviderWithApiKey(provider, request.getApiKey(), request.getApiEndpoint())
                 .collectList()
                 .map(models -> ResponseEntity.ok(ApiResponse.success(models)))

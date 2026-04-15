@@ -20,6 +20,7 @@ import com.ainovel.server.service.UserService;
 import com.ainovel.server.web.dto.AdminAuthRequest;
 import com.ainovel.server.web.dto.AdminAuthResponse;
 
+import jakarta.validation.Valid;
 import reactor.core.publisher.Mono;
 
 /**
@@ -47,7 +48,7 @@ public class AdminAuthController {
      * 管理员登录
      */
     @PostMapping("/login")
-    public Mono<ResponseEntity<ApiResponse<AdminAuthResponse>>> login(@RequestBody AdminAuthRequest request) {
+    public Mono<ResponseEntity<ApiResponse<AdminAuthResponse>>> login(@Valid @RequestBody AdminAuthRequest request) {
         return userService.findUserByUsername(request.getUsername())
                 .filter(user -> passwordEncoder.matches(request.getPassword(), user.getPassword()))
                 .filter(user -> hasAdminRole(user))

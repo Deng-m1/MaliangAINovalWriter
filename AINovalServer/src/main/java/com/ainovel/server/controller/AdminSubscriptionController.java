@@ -36,7 +36,10 @@ public class AdminSubscriptionController {
     public Mono<ResponseEntity<ApiResponse<java.util.List<SubscriptionPlan>>>> getAllPlans() {
         return subscriptionPlanService.findAll()
                 .collectList()
-                .map(list -> ResponseEntity.ok(ApiResponse.success(list)));
+                .map(list -> ResponseEntity.ok(ApiResponse.success(list)))
+                .onErrorResume(e -> Mono.just(
+                    ResponseEntity.badRequest().body(ApiResponse.error("获取订阅计划失败: " + e.getMessage()))
+                ));
     }
     
     /**

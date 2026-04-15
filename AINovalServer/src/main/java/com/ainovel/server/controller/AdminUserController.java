@@ -16,6 +16,11 @@ import com.ainovel.server.service.CreditService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
@@ -42,11 +47,12 @@ public class AdminUserController {
      */
     @GetMapping
     public Mono<ResponseEntity<ApiResponse<List<User>>>> getUsers(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "20") @Min(1) int size,
             @RequestParam(required = false) String search) {
         
-        Pageable pageable = PageRequest.of(page, size);
+        int safeSize = Math.min(size, 100);
+        Pageable pageable = PageRequest.of(page, safeSize);
         
         Flux<User> usersFlux;
         if (search != null && !search.trim().isEmpty()) {
@@ -77,7 +83,7 @@ public class AdminUserController {
      * 更新用户信息
      */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<ApiResponse<User>>> updateUser(@PathVariable String id, @RequestBody UserUpdateRequest request) {
+    public Mono<ResponseEntity<ApiResponse<User>>> updateUser(@PathVariable String id, @Valid @RequestBody UserUpdateRequest request) {
         return adminUserService.updateUser(id, request)
                 .map(updatedUser -> ResponseEntity.ok(ApiResponse.success(updatedUser)))
                 .onErrorResume(e -> Mono.just(
@@ -91,7 +97,10 @@ public class AdminUserController {
     @PatchMapping("/{id}/status")
     public Mono<ResponseEntity<ApiResponse<User>>> toggleUserStatus(
             @PathVariable String id, 
-            @RequestBody UserStatusRequest request) {
+            @Valid @RequestBody UserStatusRequest request) {
+        if (request.getStatus() == null) {
+            return Mono.just(ResponseEntity.badRequest().body(ApiResponse.error("账户状态不能为空")));
+        }
         return adminUserService.updateUserStatus(id, request.getStatus())
                 .map(updatedUser -> ResponseEntity.ok(ApiResponse.success(updatedUser)))
                 .onErrorResume(e -> Mono.just(
@@ -105,7 +114,10 @@ public class AdminUserController {
     @PostMapping("/{id}/roles")
     public Mono<ResponseEntity<ApiResponse<User>>> assignRoleToUser(
             @PathVariable String id, 
-            @RequestBody RoleAssignmentRequest request) {
+            @Valid @RequestBody RoleAssignmentRequest request) {
+        if (request.getRoleId() == null || request.getRoleId().isBlank()) {
+            return Mono.just(ResponseEntity.badRequest().body(ApiResponse.error("角色ID不能为空")));
+        }
         return adminUserService.assignRoleToUser(id, request.getRoleId())
                 .map(updatedUser -> ResponseEntity.ok(ApiResponse.success(updatedUser)))
                 .onErrorResume(e -> Mono.just(
@@ -133,7 +145,10 @@ public class AdminUserController {
     @PostMapping("/{id}/credits")
     public Mono<ResponseEntity<ApiResponse<Long>>> addCreditsToUser(
             @PathVariable String id, 
-            @RequestBody CreditOperationRequest request) {
+            @Valid @RequestBody CreditOperationRequest request) {
+        if (request.getAmount() <= 0) {
+            return Mono.just(ResponseEntity.badRequest().body(ApiResponse.error("积分数量必须大于0")));
+        }
         return creditService.addCredits(id, request.getAmount(), request.getReason())
                 .then(creditService.getUserCredits(id))
                 .map(credits -> ResponseEntity.ok(ApiResponse.success(credits)))
@@ -148,7 +163,10 @@ public class AdminUserController {
     @DeleteMapping("/{id}/credits")
     public Mono<ResponseEntity<ApiResponse<Long>>> deductCreditsFromUser(
             @PathVariable String id, 
-            @RequestBody CreditOperationRequest request) {
+            @Valid @RequestBody CreditOperationRequest request) {
+        if (request.getAmount() <= 0) {
+            return Mono.just(ResponseEntity.badRequest().body(ApiResponse.error("积分数量必须大于0")));
+        }
         return creditService.deductCredits(id, request.getAmount())
                 .then(creditService.getUserCredits(id))
                 .map(credits -> ResponseEntity.ok(ApiResponse.success(credits)))
@@ -174,8 +192,8 @@ public class AdminUserController {
      */
     @GetMapping("/page")
     public Mono<ResponseEntity<ApiResponse<PagedResponse<User>>>> getUsersPaged(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "20") @Min(1) int size,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Long minCredits,

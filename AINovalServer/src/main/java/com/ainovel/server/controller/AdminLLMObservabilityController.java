@@ -18,6 +18,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import jakarta.validation.constraints.Min;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -45,8 +47,8 @@ public class AdminLLMObservabilityController {
     @GetMapping("/traces")
     @Operation(summary = "获取LLM调用日志", description = "分页获取系统中所有的LLM调用日志")
     public Mono<ResponseEntity<ApiResponse<PagedResponse<LLMTrace>>>> getAllTraces(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size,
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "50") @Min(1) int size,
             @RequestParam(defaultValue = "timestamp") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir) {
         log.info("管理员获取LLM调用日志: page={}, size={}, sortBy={}, sortDir={}", page, size, sortBy, sortDir);
@@ -64,7 +66,7 @@ public class AdminLLMObservabilityController {
     @Operation(summary = "游标分页获取LLM调用日志", description = "基于createdAt/_id倒序的游标分页，适合无限滚动")
     public Mono<ResponseEntity<ApiResponse<CursorPageResponse<LLMTrace>>>> getTracesByCursor(
             @RequestParam(required = false) String cursor,
-            @RequestParam(defaultValue = "50") int limit,
+            @RequestParam(defaultValue = "50") @Min(1) int limit,
             @RequestParam(required = false) String userId,
             @RequestParam(required = false) String provider,
             @RequestParam(required = false) String model,
@@ -93,8 +95,8 @@ public class AdminLLMObservabilityController {
     @Operation(summary = "获取用户LLM调用日志", description = "获取指定用户的所有LLM调用日志")
     public Mono<ResponseEntity<ApiResponse<PagedResponse<LLMTrace>>>> getTracesByUserId(
             @PathVariable String userId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size) {
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "50") @Min(1) int size) {
         log.info("管理员获取用户LLM调用日志: userId={}, page={}, size={}", userId, page, size);
         
         return llmTraceService.findTracesByUserIdPageable(userId, page, size)
@@ -110,8 +112,8 @@ public class AdminLLMObservabilityController {
     @Operation(summary = "获取提供商LLM调用日志", description = "获取指定提供商的所有LLM调用日志")
     public Mono<ResponseEntity<ApiResponse<PagedResponse<LLMTrace>>>> getTracesByProvider(
             @PathVariable String provider,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size) {
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "50") @Min(1) int size) {
         log.info("管理员获取提供商LLM调用日志: provider={}, page={}, size={}", provider, page, size);
         
         return llmTraceService.findTracesByProviderPageable(provider, page, size)
@@ -127,8 +129,8 @@ public class AdminLLMObservabilityController {
     @Operation(summary = "获取模型LLM调用日志", description = "获取指定模型的所有LLM调用日志")
     public Mono<ResponseEntity<ApiResponse<PagedResponse<LLMTrace>>>> getTracesByModel(
             @PathVariable String modelName,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size) {
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "50") @Min(1) int size) {
         log.info("管理员获取模型LLM调用日志: modelName={}, page={}, size={}", modelName, page, size);
         
         return llmTraceService.findTracesByModelPageable(modelName, page, size)
@@ -145,8 +147,8 @@ public class AdminLLMObservabilityController {
     public Mono<ResponseEntity<ApiResponse<PagedResponse<LLMTrace>>>> getTracesByTimeRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size) {
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "50") @Min(1) int size) {
         log.info("管理员按时间范围获取LLM调用日志: startTime={}, endTime={}, page={}, size={}", 
                  startTime, endTime, page, size);
         
@@ -174,8 +176,8 @@ public class AdminLLMObservabilityController {
             @RequestParam(required = false) String tag,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size) {
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "50") @Min(1) int size) {
         log.info("管理员搜索LLM调用日志: userId={}, provider={}, model={}, sessionId={}, hasError={}, businessType={}, correlationId={}, traceId={}, type={}, tag={}, page={}, size={}", 
                  userId, provider, model, sessionId, hasError, businessType, correlationId, traceId, type, tag, page, size);
         
