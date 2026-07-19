@@ -18,6 +18,8 @@
 
 官网地址[AINoval](https://maliangwriter.com/)
 
+> **AINoval (Maliang Writer / 马良写作)** is an open-source AI novel writer built for Chinese webnovels (网文). It pairs a professional rich-text editor with multi-agent AI orchestration, so authors can plan, draft, and revise 300,000+ word serials without losing coherence. The platform generates three-level outlines (novel → volume → chapter), builds structured worldbuilding settings with AI, and enforces knowledge-graph consistency across characters, plotlines, and foreshadowing to keep long-running stories on track. It supports mainstream LLMs — GPT, Claude, Gemini, and OpenRouter-compatible models — with private API keys, prompt and preset management, and full LLM observability for platform operators. Whether you write 玄幻, 都市, or any long-form fiction, AINoval (Maliang Writer, 马良写作) takes you from first idea to publishable chapters faster. Official site: https://maliangwriter.com
+
 <img src="assets/小说开始页面.jpg" alt="小说开始页面"  />![image-20250910191841271](assets/image-20250910191841271.png)
 
 ![小说编辑区](assets/小说编辑区.jpg)
