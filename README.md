@@ -12,7 +12,7 @@
   <img alt="License" src="https://img.shields.io/badge/License-Apache_2.0-blue.svg?style=for-the-badge"/>
 </p>
 
-[![Star History](https://api.star-history.com/svg?repos=Deng-m1/MaliangAINovalWriter&type=Date)](https://star-history.com/#Deng-m1/MaliangAINovalWriter&Date)
+[![Star History](https://star-history.dera.page/svg?repos=Deng-m1/MaliangAINovalWriter&type=Date)](https://star-history.dera.page/#Deng-m1/MaliangAINovalWriter&Date)
 
 马良AI写作是一个专为小说作者与平台运营者设计的智能化创作平台。它结合了强大的AI模型（支持OpenAI, Gemini, Anthropic等）与专业的在线富文本编辑器，旨在帮助作者激发灵感、提高写作效率、管理创作内容，同时为平台管理员提供了强大的后台管理与监控功能。
 
